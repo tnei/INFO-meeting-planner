@@ -1,2 +1,2 @@
-import streamlit as st
-import openai
+streamlit==1.17.0
+openai==0.22.0

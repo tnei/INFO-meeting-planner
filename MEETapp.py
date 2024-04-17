@@ -1,3 +1,6 @@
+import streamlit as st
+import openai
+
 # Ensure you have set your OPENAI_API_KEY in your environment variables or Streamlit secrets
 openai.api_key = st.secrets["sk-proj-4hLzih5ZNo0XM8U6JEVmT3BlbkFJ3sJGiaaEs1XdnFLiwaRT"]
 

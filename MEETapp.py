@@ -1,18 +1,23 @@
+# Ensure you have set your OPENAI_API_KEY in your environment variables or Streamlit secrets
+openai.api_key = st.secrets["sk-proj-4hLzih5ZNo0XM8U6JEVmT3BlbkFJ3sJGiaaEs1XdnFLiwaRT"]
+
 # Function to call OpenAI's GPT model
 def ask_gpt(question):
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": question}
-        ]
-    )
-    return response['choices'][0]['message']['content']
+    try:
+        response = openai.Completion.create(
+            model="text-davinci-004",  # Update to the appropriate model you have access to
+            prompt=question,
+            max_tokens=150
+        )
+        return response.choices[0].text.strip()
+    except openai.error.OpenAIError as e:
+        st.error(f"An error occurred: {e}")
+        return "I am unable to provide an answer at this time."
 
 # Streamlit app layout
 st.title('Meeting Planner for Sales Reps')
 
-# Meeting details input
+# Meeting details input section
 with st.form("meeting_form"):
     client_name = st.text_input("Client Name")
     completed_by = st.text_input("Completed by:")
@@ -25,17 +30,18 @@ with st.form("meeting_form"):
     value_creation = st.text_area("Value Creation Ideas", placeholder="Describe the value creation ideas here")
     best_action_commitment = st.text_input("Best Action Commitment", placeholder="Get commitment to a small project")
     minimum_acceptable_action = st.text_input("Minimum Acceptable Action")
-    submit_button = st.form_submit_button("Save Meeting")
+    submitted = st.form_submit_button("Save Meeting")
 
-if submit_button:
+if submitted:
     st.success("Meeting Saved Successfully!")
 
-# AI Question Interface
+# AI Question Interface section
 st.subheader("Ask a Question")
-user_question = st.text_input("What do you need help with?")
-if st.button("Get Answer"):
+user_question = st.text_input("What do you need help with?", key="question_input")
+if st.button("Get Answer", key="answer_button"):
     if user_question:
-        answer = ask_gpt(user_question)
-        st.text_area("Answer", value=answer, height=300)
+        with st.spinner('Getting an answer...'):
+            answer = ask_gpt(user_question)
+            st.text_area("Answer", value=answer, height=300, key="answer_area")
     else:
         st.error("Please enter a question.")
